@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ouverture...</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #f0ede6;
+      --accent: #e8ff47;
+      --muted: #555;
+      --card: #141414;
+      --border: #222;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    /* Noise texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      width: fit-content;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .badge span { color: var(--accent); font-size: 10px; }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 8vw, 40px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .step:nth-child(1) { animation-delay: 0.1s; }
+    .step:nth-child(2) { animation-delay: 0.2s; }
+    .step:nth-child(3) { animation-delay: 0.3s; }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #ccc;
+      padding-top: 3px;
+    }
+
+    .step-text strong {
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    /* Icon pills for platform instructions */
+    .platform-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #1e1e1e;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: #aaa;
+      margin: 2px 2px 0;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 16px 24px;
+      border-radius: 14px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: transform 0.15s, opacity 0.15s;
+      animation: fadeUp 0.6s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .btn:active { transform: scale(0.97); opacity: 0.85; }
+
+    .btn svg { flex-shrink: 0; }
+
+    /* Redirecting state */
+    .redirecting {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .redirect-text {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Hidden by default */
+    #view-inapp, #view-normal { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- =====================================================
+       ✏️  CHANGE ONLY THIS LINE — mets ton URL ici :
+       ===================================================== -->
+  <script>
+    const DESTINATION_URL = "https://boisdefer.fr/vitabeast-ultra-bleu-vitalite-masculine-energie/";
+  </script>
+  <!-- ===================================================== -->
+
+  <div class="container">
+
+    <!-- Vue : navigateur intégré (in-app) -->
+    <div id="view-inapp">
+      <div class="badge"><span>⚠</span> Navigateur intégré détecté</div>
+      <h1>Ouvre ce lien dans ton <em>vrai</em> navigateur</h1>
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <strong>Appuie sur les 3 points</strong> <span class="platform-tag">··· ou ⋮</span> en haut à droite de l'écran
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            Sélectionne <strong>"Ouvrir dans le navigateur"</strong>
+            <br/>
+            <span class="platform-tag">Safari</span> <span class="platform-tag">Chrome</span> <span class="platform-tag">Firefox</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            Tu accèderas directement à la page 🎉
+          </div>
+        </div>
+      </div>
+      <a class="btn" id="btn-direct" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
+        </svg>
+        Essayer quand même →
+      </a>
+    </div>
+
+    <!-- Vue : navigateur normal → redirection auto -->
+    <div id="view-normal" class="redirecting">
+      <div class="spinner"></div>
+      <p style="font-family:'Syne',sans-serif;font-weight:700;font-size:20px;">Redirection…</p>
+      <p class="redirect-text">Tu vas être redirigé automatiquement.</p>
+    </div>
+
+  </div>
+
+  <script>
+    const ua = navigator.userAgent || "";
+
+    // Détection des navigateurs intégrés courants
+    const isInApp =
+      /Instagram/.test(ua) ||
+      /FBAN|FBAV/.test(ua) ||   // Facebook
+      /TikTok/.test(ua) ||
+      /Snapchat/.test(ua) ||
+      /Twitter|XClient/.test(ua) ||
+      /LinkedInApp/.test(ua) ||
+      /Pinterest/.test(ua) ||
+      /Musical\.ly/.test(ua) ||
+      /Line\//.test(ua) ||
+      /GSA\//.test(ua);         // Google Search App
+
+    const btnDirect = document.getElementById("btn-direct");
+    if (btnDirect) btnDirect.href = DESTINATION_URL;
+
+    if (isInApp) {
+      // Affiche les instructions
+      document.getElementById("view-inapp").style.display = "flex";
+      document.getElementById("view-inapp").style.flexDirection = "column";
+      document.getElementById("view-inapp").style.gap = "28px";
+
+      // Tente quand même une astuce TikTok
+      if (/TikTok/.test(ua)) {
+        const sep = DESTINATION_URL.includes("?") ? "&" : "?";
+        btnDirect.href = DESTINATION_URL + sep + "openExternalBrowser=1";
+      }
+    } else {
+      // Navigateur normal : redirection immédiate
+      document.getElementById("view-normal").style.display = "flex";
+      document.getElementById("view-normal").style.flexDirection = "column";
+      window.location.replace(DESTINATION_URL);
+    }
+  </script>
+
+</body>
+</html>
